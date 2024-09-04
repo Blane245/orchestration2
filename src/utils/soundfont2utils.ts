@@ -20,7 +20,7 @@ export const toMidi = (note: string): number | undefined => {
       return -1;
     }
     const offset: number = getOffset(acc);
-    return (Number(oct) + 1) * 12 + (chroma as number) + offset;
+    return (Number(oct)) * 12 + (chroma as number) + offset;
 
   } catch (e) {
     return undefined;

@@ -67,7 +67,7 @@ export default function PlayNotes(props: PlayNotesProps) {
 
         // the business end of note playing
         if (running.value) {
-            const preset: Preset | undefined = presets.find((p) => p.header.name == SFinstrument.name);
+            const preset: Preset | undefined = presets.find((p) => p.header.name == SFinstrument.presetName);
             if (preset == undefined) {
                 setMessage({ error: true, text: `no soundfont for ${SFinstrument.name}` });
                 return;

@@ -200,6 +200,7 @@ export const MODES: Mode[] = [
 // each instrument has a name, its lowest and highest notes, a pitch, a clef, and a octave shift
 export type SFInstrument = {
     name: string,
+    presetName: string,
     lowNote: number,
     highNote: number,
     instrumentPitch: KeySignature,
@@ -211,59 +212,48 @@ export type SFInstrument = {
 export const SFINSTRUMENTS: SFInstrument[] = [
     {
         name: 'Flute',
+        presetName: 'Flute',
         lowNote: 36, // C4
         highNote: 72, //C7
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble'},
-        octaveShift: 1
+        octaveShift: 0
     },
     {
         name: 'Bassoon',
+        presetName: 'Bassoon',
         lowNote: 10, // Bb1
         highNote: 51, // Eb5
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
-        clef: { name: 'base'},
-        octaveShift: 1
+        clef: { name: 'bass'},
+        octaveShift: 0
     },
     {
         name: 'Violin',
+        presetName: 'Violin',
         lowNote: 31, // G3
         highNote: 83, // B7
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble'},
-        octaveShift: 1
+        octaveShift: 0
     },
     {
-        name: 'Soprano Recorder',
-        lowNote: 36, // C4 8va
-        highNote: 62, // D6 8va
+        name: 'Viola',
+        presetName: 'Viola',
+        lowNote: 36, // C3
+        highNote: 85, // D7
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble', annotation: '8va' },
-        octaveShift: 1
-    },
-    {
-        name: 'Alto Recorder',
-        lowNote: 41, // F4
-        highNote: 67, // G6
-        instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
-        clef: { name: 'treble' },
         octaveShift: 0
     },
     {
-        name: 'Tenor Recorder',
-        lowNote: 36, // C4
-        highNote: 62, // D6
+        name: 'Cello',
+        presetName: 'Cello',
+        lowNote: 24, // C2
+        highNote: 72, // C6
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble' },
         octaveShift: 0
-    },
-    {
-        name: 'Bass Recorder',
-        lowNote: 17, // F3 8vb
-        highNote: 43, // G5
-        instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
-        clef: { name: 'bass', annotation: '8vb' },
-        octaveShift: -1
     },
 ]
 
