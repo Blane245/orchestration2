@@ -17,7 +17,7 @@ export interface PlayNotesProps {
     setMessage: Function,
 }
 
-const SOUNDFONTFILE = './soundfonts/Symphony.SF2'
+const SOUNDFONTFILE = './src/soundfonts/Symphony.SF2'
 export default function PlayNotes(props: PlayNotesProps) {
     const [running, setRunning] = useState<{value:boolean}>({value:false});
     const [tempo, setTempo] = useState<number>(60);
