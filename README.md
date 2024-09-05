@@ -31,11 +31,11 @@ message area
     * Aeolian (natural minor)
     * Locrian
   * Pitch
-    * concert pitch
+    * concert pitch (default)
     * instrument pitch
 
   * Display options
-    * Ascending
+    * Ascending (default)
     * descending
     * ascending and descending
 
@@ -45,5 +45,8 @@ message area
 ## Footer
 displays current scale, mode, instrument, pitch, and display option selected
 # Implementation
-Implemented in Vite/React TrueScript with the [VexFlow](https://www.vexflow.com/) addon. 
+Implemented in Vite/React TrueScript with the [VexFlow](https://www.vexflow.com/) and [SoundFont2](https://mrtenz.github.io/soundfont2/getting-started/soundfont2-structure.html) addons. 
 This is my first TrueScript project. There is not much use for a server for this application unless some user data retention is needed in the future.
+# Notes
+I am using the Symphony.SF2 soundfont file that I found somewhere. The midi ranges for the instruments do not exactly match the instruments ranges as defined in Wikipedia. Some 'tuning' could be done for this.
+The conversion between the EasyScore note names and midi numbers is caught up in the C3-C4 convention fight. My KEYBOARD is then a bit offset. The keyboard runs from C0 to B8, midi numbers 12 to 119. 

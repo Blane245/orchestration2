@@ -13,31 +13,33 @@ export const DIATONIC: number[] = [1, 3, 5, 6, 8, 10, 11]
 // note numbers from C to B for pentatonic scale
 export const PENTATONIC: number[] = [1, 3, 5, 8, 10]
 
-// The basic note values and their depending on whether the key signature has sharp, flat, or no accidentals
-export type BaseNote = { value: number, naturalName?: string, flatName?: string, sharpName?: string }
+// The basic note values and their symbols depending on whether the key signature has sharp, flat, or no accidentals
+export type BaseNote = { naturalName?: string, flatName?: string, sharpName?: string }
 
 // build the entire keyboard
 function generateBaseNotes(): BaseNote[] {
     let notes: BaseNote[] = []
     const noteBaseNames: BaseNote[] = [
-        { value: 0, naturalName: 'C'},
-        { value: 1, flatName: 'Db', sharpName: 'C#' },
-        { value: 2, naturalName: 'D'},
-        { value: 3, flatName: 'Eb', sharpName: 'D#' },
-        { value: 4, naturalName: 'E'},
-        { value: 5, naturalName: 'F', sharpName: 'E#' },
-        { value: 6, flatName: 'Gb', sharpName: 'F#' },
-        { value: 7, naturalName: 'G'}, 
-        { value: 8, flatName: 'Ab', sharpName: 'G#' },
-        { value: 9, naturalName: 'A'},
-        { value: 10, flatName: 'Bb', sharpName: 'A#' },
-        { value: 11, naturalName: 'B', flatName: 'Cb'},
+        { naturalName: 'C' },
+        { flatName: 'Db', sharpName: 'C#' },
+        { naturalName: 'D' },
+        { flatName: 'Eb', sharpName: 'D#' },
+        { naturalName: 'E' },
+        { naturalName: 'F', sharpName: 'E#' },
+        { flatName: 'Gb', sharpName: 'F#' },
+        { naturalName: 'G' },
+        { flatName: 'Ab', sharpName: 'G#' },
+        { naturalName: 'A' },
+        { flatName: 'Bb', sharpName: 'A#' },
+        { naturalName: 'B', flatName: 'Cb' },
     ]
-    for (let octave = 1; octave < 8; octave++) {
+
+    // this goes from C/0 to B/8, which is wider that the 88 key piano
+    for (let octave = 0; octave <= 8; octave++) {
         for (let i = 0; i < 12; i++) {
             const thisNote = noteBaseNames[i]
             // add the octave to each of the possible note names
-            const note: BaseNote = { value: i + (octave - 1) * 12 }
+            const note: BaseNote = {}
             if (thisNote.naturalName != undefined)
                 note.naturalName = `${thisNote.naturalName}/${octave}`
             if (thisNote.sharpName != undefined)
@@ -48,7 +50,7 @@ function generateBaseNotes(): BaseNote[] {
                     note.flatName = `${thisNote.flatName}/${octave}`
             } else {
                 if (thisNote.flatName != undefined)
-                    note.flatName = `${thisNote.flatName}/${octave+1}`
+                    note.flatName = `${thisNote.flatName}/${octave + 1}`
             }
             notes.push(note)
         }
@@ -56,7 +58,7 @@ function generateBaseNotes(): BaseNote[] {
     return notes
 }
 
-// The note names for the entire keyboard
+// The note names for the entire keyboard (plus a few)
 export const KEYBOARD: BaseNote[] = generateBaseNotes()
 
 // a key either has flats, sharps, or no accidentals
@@ -123,7 +125,7 @@ function generateKeySignatures() {
 
     // circle of fifths
     keys.push(
-        generateKeySignature('C', 0, 'major',  'C', ACCIDENTAL.none, 'nnnnnnn'),
+        generateKeySignature('C', 0, 'major', 'C', ACCIDENTAL.none, 'nnnnnnn'),
         generateKeySignature('a natural', 9, 'naturalminor', 'C', ACCIDENTAL.none, 'nnnnnnn'),
         generateKeySignature('a harmonic', 9, 'harmonicminor', 'C', ACCIDENTAL.none, 'nnnnnnn'),
         generateKeySignature('a melodic', 9, 'melodicminor', 'C', ACCIDENTAL.none, 'nnnnnnn'),
@@ -140,9 +142,9 @@ function generateKeySignatures() {
         generateKeySignature('f♯ harmonic', 6, 'harmonicminor', 'A', ACCIDENTAL.sharp, '#nn##nn'),
         generateKeySignature('f♯ melodic', 6, 'melodicminor', 'A', ACCIDENTAL.sharp, '#nn##nn'),
         generateKeySignature('E', 4, 'major', 'E', ACCIDENTAL.sharp, '##n##nn'), // F# C# G# D#
-        generateKeySignature('c♯ natural', 1, 'naturalminor', 'E', ACCIDENTAL.sharp, '##n##nn'), 
-        generateKeySignature('c♯ harmonic', 1, 'harmonicminor', 'E', ACCIDENTAL.sharp, '##n##nn'), 
-        generateKeySignature('c♯ melodic', 1, 'melodicminor', 'E', ACCIDENTAL.sharp, '##n##nn'), 
+        generateKeySignature('c♯ natural', 1, 'naturalminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
+        generateKeySignature('c♯ harmonic', 1, 'harmonicminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
+        generateKeySignature('c♯ melodic', 1, 'melodicminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
         generateKeySignature('B', 11, 'major', 'B', ACCIDENTAL.sharp, '##n###n'), // F# C# G# D# A#
         generateKeySignature('g♯ natural', 8, 'naturalminor', 'B', ACCIDENTAL.sharp, '##n###n'),
         generateKeySignature('g♯ harmonic', 8, 'harmonicminor', 'B', ACCIDENTAL.sharp, '##n###n'),
@@ -172,9 +174,9 @@ function generateKeySignatures() {
         generateKeySignature('g harmonic', 7, 'harmonicminor', 'Bb', ACCIDENTAL.flat, 'nnbnnnb'),
         generateKeySignature('g melodic', 7, 'melodicminor', 'Bb', ACCIDENTAL.flat, 'nnbnnnb'),
         generateKeySignature('F', 5, 'major', 'F', ACCIDENTAL.flat, 'nnnnnnb'), // Bb
-        generateKeySignature('d natural', 2, 'naturalminor', 'F', ACCIDENTAL.flat, 'nnnnnnb'), 
-        generateKeySignature('d harmonic', 2, 'harmonicminor', 'F', ACCIDENTAL.flat, 'nnnnnnb'), 
-        generateKeySignature('d melodic', 2, 'melodicminor', 'F', ACCIDENTAL.flat, 'nnnnnnb'), 
+        generateKeySignature('d natural', 2, 'naturalminor', 'F', ACCIDENTAL.flat, 'nnnnnnb'),
+        generateKeySignature('d harmonic', 2, 'harmonicminor', 'F', ACCIDENTAL.flat, 'nnnnnnb'),
+        generateKeySignature('d melodic', 2, 'melodicminor', 'F', ACCIDENTAL.flat, 'nnnnnnb'),
     )
     return keys;
 }
@@ -213,44 +215,44 @@ export const SFINSTRUMENTS: SFInstrument[] = [
     {
         name: 'Flute',
         presetName: 'Flute',
-        lowNote: 36, // C4
-        highNote: 72, //C7
+        lowNote: 60 - 12, // C4
+        highNote: 96 - 12, //C7
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
-        clef: { name: 'treble'},
+        clef: { name: 'treble' },
         octaveShift: 0
     },
     {
         name: 'Bassoon',
         presetName: 'Bassoon',
-        lowNote: 10, // Bb1
-        highNote: 51, // Eb5
+        lowNote: 34 - 12, // Bb1
+        highNote: 75 - 12, // Eb5
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
-        clef: { name: 'bass'},
+        clef: { name: 'bass' },
         octaveShift: 0
     },
     {
         name: 'Violin',
         presetName: 'Violin',
-        lowNote: 31, // G3
-        highNote: 83, // B7
+        lowNote: 55-12, // G3
+        highNote: 107-12, // B7
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
-        clef: { name: 'treble'},
+        clef: { name: 'treble' },
         octaveShift: 0
     },
     {
         name: 'Viola',
         presetName: 'Viola',
-        lowNote: 36, // C3
-        highNote: 85, // D7
+        lowNote: 48-12, // C3
+        highNote: 91-12, // G6
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
-        clef: { name: 'treble', annotation: '8va' },
+        clef: { name: 'treble'},
         octaveShift: 0
     },
     {
         name: 'Cello',
         presetName: 'Cello',
-        lowNote: 24, // C2
-        highNote: 72, // C6
+        lowNote: 36-12, // C2
+        highNote: 72-12, // C5
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble' },
         octaveShift: 0
@@ -258,15 +260,15 @@ export const SFINSTRUMENTS: SFInstrument[] = [
 ]
 
 // The allowed scales and progressions
-export type Scale = {name: string, nominalSequence: number[]}
+export type Scale = { name: string, nominalSequence: number[] }
 
 export const SCALES: Scale[] = [
-    {name: 'Diatonic', nominalSequence: [0, 3, 4, 5, 7, 9, 11]},
-    {name: 'Pentatonic', nominalSequence: [0, 2, 4, 7, 9]},
-    {name: 'Thirds', nominalSequence: [0, 4, 7, 11]},
-    {name: 'Fourths', nominalSequence: [0, 5]},
-    {name: 'Fifths', nominalSequence: [0, 7]},
-    {name: 'Chromatic', nominalSequence: [0,1,2,3,4,5,6,7,8,9,11]}
+    { name: 'Diatonic', nominalSequence: [0, 3, 4, 5, 7, 9, 11] },
+    { name: 'Pentatonic', nominalSequence: [0, 2, 4, 7, 9] },
+    { name: 'Thirds', nominalSequence: [0, 4, 7, 11] },
+    { name: 'Fourths', nominalSequence: [0, 5] },
+    { name: 'Fifths', nominalSequence: [0, 7] },
+    { name: 'Chromatic', nominalSequence: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11] }
 ]
 
 // each scale can be displayed as ascending, descending, or ascending and descending
