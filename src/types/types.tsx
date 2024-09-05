@@ -200,7 +200,7 @@ export const MODES: Mode[] = [
 ]
 
 // each instrument has a name, its lowest and highest notes, a pitch, a clef, and a octave shift
-export type SFInstrument = {
+export type VXInstrument = {
     name: string,
     presetName: string,
     lowNote: number,
@@ -211,7 +211,7 @@ export type SFInstrument = {
 }
 
 // the list of instruments supported
-export const SFINSTRUMENTS: SFInstrument[] = [
+export const VXInstrumentS: VXInstrument[] = [
     {
         name: 'Flute',
         presetName: 'Flute',

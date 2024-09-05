@@ -1,12 +1,12 @@
 import { Accidental, Formatter, Renderer, Stave, StaveNote, Voice } from 'vexflow'
-import { ACCIDENTAL, DisplayOption, SFInstrument, KEYBOARD, BaseNote, KeySignature, Mode, Pitch, Scale} from '../types/types'
+import { ACCIDENTAL, DisplayOption, VXInstrument, KEYBOARD, BaseNote, KeySignature, Mode, Pitch, Scale} from '../types/types'
 import { useEffect } from 'react';
 
 // using VexFlow, draw the notes requested
 export interface DrawNotesProps {
     scale: Scale,
     mode: Mode,
-    instrument: SFInstrument,
+    instrument: VXInstrument,
     pitch: Pitch,
     keySignature: KeySignature,
     displayOption: DisplayOption,
@@ -44,7 +44,9 @@ export function DrawNotes(props: DrawNotesProps) {
             const voice = new Voice({ num_beats: notes.length, beat_value: 4 })
             voice.addTickables(notes)
             new Formatter().joinVoices([voice]).format([voice], 350);
-            voice.draw(context, stave);
+            voice.setContext(context);
+            voice.setStave(stave);
+            voice.draw();
         }
 
     }, [scale, mode, instrument, pitch, keySignature, width, length, displayOption])
@@ -90,6 +92,9 @@ export function DrawNotes(props: DrawNotesProps) {
                     const staveNote: StaveNote = new StaveNote({ keys: [noteName], duration: 'q', clef: instrument.clef.name })
                     if (modifier != '')
                         staveNote.addModifier(new Accidental(modifier));
+                    staveNote.setStyle({fillStyle: 'black'});
+                    console.log(staveNote.getStyle());
+
                     notes.push(staveNote)
                 }
             }
@@ -116,6 +121,8 @@ export function DrawNotes(props: DrawNotesProps) {
                     const staveNote: StaveNote = new StaveNote({ keys: [noteName], duration: 'q', clef: instrument.clef.name })
                     if (modifier != '')
                         staveNote.addModifier(new Accidental(modifier));
+                    staveNote.setStyle({fillStyle:'black'});
+                    console.log(staveNote.getStyle());
                     notes.push(staveNote)
                 }
             }

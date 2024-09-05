@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Grid } from '@mui/material'
-import { DisplayOption, DISPLAYOPTIONS, SFInstrument, SFINSTRUMENTS, KeySignature, KEYSIGNATURES, Mode, MODES, Pitch, PITCHES, Scale, SCALES } from '../types/types'
+import { DisplayOption, DISPLAYOPTIONS, VXInstrument, VXInstrumentS, KeySignature, KEYSIGNATURES, Mode, MODES, Pitch, PITCHES, Scale, SCALES } from '../types/types'
 import { HEADER, SPACING } from './config-layout';
 import { DrawNotes } from '../components/drawnotes';
 import PlayNotes from '../components/playnotes';
@@ -14,7 +14,7 @@ export default function Body(props: BodyProps) {
 
     const [scale, setScale] = useState<Scale>();
     const [mode, setMode] = useState<Mode>();
-    const [instrument, setInstrument] = useState<SFInstrument>();
+    const [instrument, setInstrument] = useState<VXInstrument>();
     const [pitch, setPitch] = useState<Pitch>();
     const [keySignature, setKeySignature] = useState<KeySignature>()
     const [displayOption, setDisplayOption] = useState<DisplayOption>();
@@ -25,14 +25,14 @@ export default function Body(props: BodyProps) {
         setScale(SCALES[0]);
         setMode(MODES[0]);
         setKeySignature(KEYSIGNATURES[0]);
-        setInstrument(SFINSTRUMENTS[0]);
+        setInstrument(VXInstrumentS[0]);
         setPitch(PITCHES[0]);
         setDisplayOption(DISPLAYOPTIONS[0])
         props.setMessage({ error: false, text: 'Welcome to Instrument Notes' });
-        UpdateStatus(SFINSTRUMENTS[0], SCALES[0], MODES[0], PITCHES[0], KEYSIGNATURES[0], DISPLAYOPTIONS[0]);
+        UpdateStatus(VXInstrumentS[0], SCALES[0], MODES[0], PITCHES[0], KEYSIGNATURES[0], DISPLAYOPTIONS[0]);
     }, [props.setMessage, props.setStatus])
 
-    function UpdateStatus(inst: SFInstrument | undefined, scal: Scale | undefined, mod: Mode | undefined, pitc: Pitch | undefined, key: KeySignature | undefined, display: DisplayOption | undefined) {
+    function UpdateStatus(inst: VXInstrument | undefined, scal: Scale | undefined, mod: Mode | undefined, pitc: Pitch | undefined, key: KeySignature | undefined, display: DisplayOption | undefined) {
         // this will update the display based on the current props values
         if (inst != undefined &&
             scal != undefined &&
@@ -46,7 +46,7 @@ export default function Body(props: BodyProps) {
 
     function HandleInstrumentChange(event: React.ChangeEvent<HTMLSelectElement>): void {
         const instName: string = event.target.value;
-        const inst: SFInstrument | undefined = SFINSTRUMENTS.find((i) => i.name == instName);
+        const inst: VXInstrument | undefined = VXInstrumentS.find((i) => i.name == instName);
         if (inst !== undefined) {
             setInstrument(inst);
             UpdateStatus(inst, scale, mode, pitch, keySignature, displayOption);
@@ -129,11 +129,11 @@ export default function Body(props: BodyProps) {
                         <label htmlFor='instrument'>&nbsp;Instrument: </label>
                         <select
                             id='instrument'
-                            value={instrument != undefined ? instrument.name : SFINSTRUMENTS[0].name}
+                            value={instrument != undefined ? instrument.name : VXInstrumentS[0].name}
                             onChange={((event: React.ChangeEvent<HTMLSelectElement>) =>
                                 HandleInstrumentChange(event))}
                         >
-                            {SFINSTRUMENTS.map((i) => (
+                            {VXInstrumentS.map((i) => (
                                 <option key={i.name} value={i.name}>{i.name}</option>
                             ))}
                         </select>
@@ -232,7 +232,7 @@ export default function Body(props: BodyProps) {
                 <Grid container direction='row' justifyContent={'flex-start'}>
                     <PlayNotes
                         notes={notes}
-                        SFinstrument={instrument}
+                        VXInstrument={instrument}
                         setMessage={props.setMessage}
                     />
                 </Grid>

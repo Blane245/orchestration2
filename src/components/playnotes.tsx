@@ -3,8 +3,8 @@
 // TODO notes are being played too short
 import { Button, Grid, Slider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { StaveNote } from "vexflow";
-import { SFInstrument, Message } from "../types/types";
+import { StaveNote, ElementStyle } from "vexflow";
+import { VXInstrument, Message } from "../types/types";
 import { SoundFont2 } from "soundfont2";
 import { loadSoundFont } from "../middleware/soundfont";
 import { getBufferSourceNodeFromSample, precision, tc2s, toMidi } from "../utils/soundfont2utils";
@@ -12,18 +12,18 @@ import { Envelop, Preset } from "../types/soundfonttypes";
 
 // may add sound file selector 
 export interface PlayNotesProps {
-    SFinstrument: SFInstrument | undefined,
+    VXInstrument: VXInstrument | undefined,
     notes: StaveNote[],
     setMessage: Function,
 }
 
 const SOUNDFONTFILE = './src/soundfonts/Symphony.SF2'
 export default function PlayNotes(props: PlayNotesProps) {
-    const [running, setRunning] = useState<{value:boolean}>({value:false});
+    const [running, setRunning] = useState<boolean>(false);
     const [tempo, setTempo] = useState<number>(60);
     const [volume, setVolume] = useState<number>(50);
     const [presets, setPresets] = useState<Preset[]>([]);
-    const { SFinstrument, notes, setMessage } = props;
+    const { VXInstrument, notes, setMessage } = props;
 
     // realtime processing constants
     const LOOKAHEAD: number = 25.0; // how frequently to call the schedule function (ms)
@@ -34,9 +34,12 @@ export default function PlayNotes(props: PlayNotesProps) {
     let timerID: number = 0; // the timer used to set the schedule 
     let sampleSequence: {
         buffer: AudioBufferSourceNode,
-        envelop: Envelop
+        envelop: Envelop,
+        note: StaveNote
     }[] = [];
     let context: AudioContext | undefined = undefined;
+    let previousStyle: ElementStyle | undefined = undefined;
+    let stopRunning:boolean = false;
 
     // load the soundfont file when initializing
     //TODO deconflict Preset interface 
@@ -62,14 +65,14 @@ export default function PlayNotes(props: PlayNotesProps) {
     useEffect(() => {
 
         // wait for the everthing to be ready
-        if (presets == undefined || presets.length == 0 || SFinstrument == undefined)
+        if (presets == undefined || presets.length == 0 || VXInstrument == undefined)
             return;
 
         // the business end of note playing
-        if (running.value) {
-            const preset: Preset | undefined = presets.find((p) => p.header.name == SFinstrument.presetName);
+        if (running) {
+            const preset: Preset | undefined = presets.find((p) => p.header.name == VXInstrument.presetName);
             if (preset == undefined) {
-                setMessage({ error: true, text: `no soundfont for ${SFinstrument.name}` });
+                setMessage({ error: true, text: `no soundfont for ${VXInstrument.name}` });
                 return;
             } else {
                 context = new AudioContext();
@@ -81,6 +84,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     currentNote = 0;
                     nextNoteTime = 0.0
                     sampleSequence = sources;
+                    stopRunning = false;
                     scheduler();
                 }
             }
@@ -92,16 +96,16 @@ export default function PlayNotes(props: PlayNotesProps) {
             }
         }
 
-    }, [running, presets, notes, SFinstrument, tempo]);
+    }, [running, presets, notes, VXInstrument]);
 
     return (
         <>
             <Grid item>
                 <Button
-                    onClick={() => { setRunning({value:!running.value}) }}
-                    disabled={presets == undefined || presets.length == 0 || SFinstrument == undefined}
+                    onClick={() => { if (running) stopRunning = true; setRunning(!running) }}
+                    disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
                 >
-                    {running.value ? 'Stop' : 'Start'}
+                    {running ? 'Stop' : 'Start'}
                 </Button>
             </Grid>
             <Grid item>
@@ -115,7 +119,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     min={40}
                     max={220}
                     onChange={(event, value) => { setTempo(value as number) }}
-                    disabled={presets == undefined || presets.length == 0 || SFinstrument == undefined}
+                    disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
                 />
             </Grid>
             <Grid item>
@@ -129,7 +133,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     min={0}
                     max={100}
                     onChange={(event, value) => { setVolume(value as number) }}
-                    disabled={presets == undefined || presets.length == 0 || SFinstrument == undefined}
+                    disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
                 />
             </Grid>
         </>
@@ -145,12 +149,13 @@ export default function PlayNotes(props: PlayNotesProps) {
     function setupNoteSequence(preset: Preset, context: AudioContext, notes: StaveNote[]): {
         sources: {
             buffer: AudioBufferSourceNode,
-            envelop: Envelop
+            envelop: Envelop,
+            note: StaveNote
         }[],
         message: Message
     } {
         // get all of the notes for the preset into an array
-        const result: { buffer: AudioBufferSourceNode, envelop: Envelop }[] = [];
+        const result: { buffer: AudioBufferSourceNode, envelop: Envelop, note: StaveNote }[] = [];
         let message: Message = { error: false, text: '' };
 
         notes.every(note => {
@@ -161,7 +166,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                 return false;
             }
             // construct the note from the instrument zones, generators, and the midi number
-            const { source, message: thisMessage } = getBufferSourceNodeFromSample(context, preset, midi);
+            const { source, message: thisMessage } = getBufferSourceNodeFromSample(context, preset, midi, note);
             if (thisMessage.error) {
                 message = thisMessage;
                 return false;
@@ -175,32 +180,19 @@ export default function PlayNotes(props: PlayNotesProps) {
 
     // loop through the samplenode
     // get the sample for 1/tempo seconds from the soundfont
-
     // while there are notes that will need to be played before the next
-    // interal, schedule them
-    // there will be either none or one in this version
-
-    // schduler needs to allow a rerender between each note
     function scheduler(): void {
-        // console.log(`schedule current note ${currentNote} next note time ${nextNoteTime} context time ${context.currentTime}`)
-        if (currentNote >= 0 && context != undefined && running.value) {
+        if (currentNote >= 0 && context != undefined && !stopRunning) {
             if (nextNoteTime < context.currentTime + SCHEDULEAHEADTIME) {
                 scheduleNote(currentNote, nextNoteTime);
                 nextNote();
             }
-            // force a render on playing components
-            // other update will be ignored until the playback is done
-            // setRunning({...running});
-
-            // setTempo((c) => { const value = c; return value; })
-            // setVolume((c) => { const value = c; return value; })
 
             // reschedule 
             timerID = window.setTimeout(scheduler, LOOKAHEAD);
 
         }
         else {
-            setRunning({value:false});
             clearTimeout(timerID);
         }
     }
@@ -221,11 +213,39 @@ export default function PlayNotes(props: PlayNotesProps) {
         nextNoteTime += secondsPerBeat;
         currentNote = (currentNote >= sampleSequence.length - 1 ? currentNote = -1 : currentNote + 1);
         console.log(`current note is ${currentNote}, sample sequence length ${sampleSequence.length}, next note time ${nextNoteTime}`);
+        if (currentNote < 0) 
+            highlightDisplayedNote(currentNote);
     }
 
-    // will highlight the note being played when implemented
+    // will highlight the note being played and return the previous not to its origianl style
+
     function highlightDisplayedNote(currentNote: number): void {
 
+        if (context != undefined) {
+
+            // unhighlight last stavenote when sequence is finished
+            if (currentNote < 0) {
+                const {note: lastStaveNote} = sampleSequence[sampleSequence.length-1];
+                if (previousStyle != undefined) lastStaveNote.setStyle(previousStyle);
+                return;
+            }
+
+            // save current note's style so it can be restore later
+            const { note } = sampleSequence[currentNote];
+            const previousNote: number = currentNote - 1;
+            if (previousNote >= 0) {
+                previousStyle = note.getStyle();
+            }
+
+            // return previous note style to its previous value
+            if (previousNote >= 0) {
+                const { note: previousStaveNote } = sampleSequence[previousNote];
+                if (previousStyle != undefined) previousStaveNote.setStyle(previousStyle);
+            }
+
+            // update the style
+            note.setStyle({ fillStyle: 'red' })
+        }
     }
 
     function setGainEnvelop(gain: AudioParam, volume: number, envelop: Envelop, time: number): void {

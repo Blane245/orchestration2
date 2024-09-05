@@ -1,3 +1,4 @@
+import { StaveNote } from "vexflow";
 import { Envelop, Generator, Zone, Preset } from "../types/soundfonttypes";
 import { Message } from "../types/types";
 
@@ -111,8 +112,9 @@ export function getBufferSourceNodeFromSample(
   context: AudioContext,
   preset: Preset,
   midi: number,
+  note:StaveNote
 ): 
-{ source: {buffer: AudioBufferSourceNode, envelop: Envelop}, message: Message } {
+{ source: {buffer: AudioBufferSourceNode, envelop: Envelop, note:StaveNote}, message: Message } {
 
   // sequence
   // get the generator parameter value from the preset, zone, and instrument
@@ -166,7 +168,7 @@ if (loopEnd > loopStart && sampleModes === 1) {
   const decayVolEnv:number | undefined = generatorValues.get(36);
   const envelop = {velocity, attackVolEnv, decayVolEnv};
 
-  return {source:{buffer: source, envelop: envelop}, message: {error:false, text:''}}
+  return {source:{buffer: source, envelop: envelop, note:note}, message: {error:false, text:''}}
 }
 // while the sfumato solution for playing soundfont files is very elegant
 // it is a bit of overkill for what I need. It uses some but not all of the
