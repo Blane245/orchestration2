@@ -21,7 +21,7 @@ function App() {
     <Header 
       appName='Instrument Notes'
       appVersion='0.0.0'
-      appIcon='./images/logo.svg'
+      appIcon='./src/images/O.svg'
       message={message}
     />
     <Box

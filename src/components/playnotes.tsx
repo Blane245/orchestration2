@@ -18,28 +18,34 @@ export interface PlayNotesProps {
 }
 
 const SOUNDFONTFILE = './src/soundfonts/Symphony.SF2'
+// realtime processing constants
+const LOOKAHEAD: number = 25.0; // how frequently to call the schedule function (ms)
+// this is about 10 times the fastest BPM
+const SCHEDULEAHEADTIME = 0.1 // how far ahead to schedule audio (seconds)
+const DEFAULTNOTEFILL = 'black'
+const HIGHLIGHTNOTEFILL = 'red'
+
+// the mutable variables of this component
+let currentNote: number = 0; // the note being played
+let nextNoteTime = 0.0; // when the next note is due
+let timerID: number = 0; // the timer used to set the schedule 
+let sampleSequence: {
+    buffer: AudioBufferSourceNode,
+    envelop: Envelop,
+    noteElement: Element
+}[] = [];
+let context: AudioContext | undefined = undefined;
+let stopRunning: boolean = false;
+let currentTempo: number = 60;
+let currentVolume: number = 50;
+let staveNoteElements: HTMLCollectionOf<Element> = document.getElementsByClassName('');
+
 export default function PlayNotes(props: PlayNotesProps) {
     const [running, setRunning] = useState<boolean>(false);
     const [tempo, setTempo] = useState<number>(60);
     const [volume, setVolume] = useState<number>(50);
     const [presets, setPresets] = useState<Preset[]>([]);
     const { VXInstrument, notes, setMessage } = props;
-
-    // realtime processing constants
-    const LOOKAHEAD: number = 25.0; // how frequently to call the schedule function (ms)
-    // this is about 10 times the fastest BPM
-    const SCHEDULEAHEADTIME = 0.1 // how far ahead to schedule audio (seconds)
-    let currentNote: number = 0; // the note being played
-    let nextNoteTime = 0.0; // when the next note is due
-    let timerID: number = 0; // the timer used to set the schedule 
-    let sampleSequence: {
-        buffer: AudioBufferSourceNode,
-        envelop: Envelop,
-        note: StaveNote
-    }[] = [];
-    let context: AudioContext | undefined = undefined;
-    let previousStyle: ElementStyle | undefined = undefined;
-    let stopRunning:boolean = false;
 
     // load the soundfont file when initializing
     //TODO deconflict Preset interface 
@@ -118,7 +124,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     valueLabelDisplay='auto'
                     min={40}
                     max={220}
-                    onChange={(event, value) => { setTempo(value as number) }}
+                    onChange={(event, value) => { currentTempo = value as number; setTempo(value as number) }}
                     disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
                 />
             </Grid>
@@ -132,7 +138,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     valueLabelDisplay='auto'
                     min={0}
                     max={100}
-                    onChange={(event, value) => { setVolume(value as number) }}
+                    onChange={(event, value) => { currentVolume = value as number; setVolume(value as number) }}
                     disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
                 />
             </Grid>
@@ -150,15 +156,17 @@ export default function PlayNotes(props: PlayNotesProps) {
         sources: {
             buffer: AudioBufferSourceNode,
             envelop: Envelop,
-            note: StaveNote
+            noteElement: Element
         }[],
         message: Message
     } {
-        // get all of the notes for the preset into an array
-        const result: { buffer: AudioBufferSourceNode, envelop: Envelop, note: StaveNote }[] = [];
-        let message: Message = { error: false, text: '' };
+        // get all of the stavenote components from the HTML
+        staveNoteElements = document.getElementsByClassName("vf-stavenote");
 
-        notes.every(note => {
+        // get all of the notes for the preset into an array
+        const result: { buffer: AudioBufferSourceNode, envelop: Envelop, noteElement: Element }[] = [];
+        let message: Message = { error: false, text: '' };
+        notes.every((note, index) => {
             const noteName = note.keys[0];
             const midi: number | undefined = toMidi(noteName);
             if (midi == undefined) {
@@ -166,12 +174,13 @@ export default function PlayNotes(props: PlayNotesProps) {
                 return false;
             }
             // construct the note from the instrument zones, generators, and the midi number
-            const { source, message: thisMessage } = getBufferSourceNodeFromSample(context, preset, midi, note);
+            const { source, message: thisMessage } = getBufferSourceNodeFromSample(context, preset, midi);
             if (thisMessage.error) {
                 message = thisMessage;
                 return false;
             }
-            result.push(source);
+            const noteElement: Element = staveNoteElements[index];
+            result.push({ buffer: source.buffer, envelop: source.envelop, noteElement: noteElement });
             return true;
         });
 
@@ -194,57 +203,58 @@ export default function PlayNotes(props: PlayNotesProps) {
         }
         else {
             clearTimeout(timerID);
+            setRunning(false);
         }
     }
 
     // play the specific note based on the current note pointer
     function scheduleNote(currentNote: number, time: number): void {
         if (currentNote >= 0) {
-            highlightDisplayedNote(currentNote);
-            console.log(`play note ${currentNote} at time ${time}`);
-            playNoteSample(currentNote, time);
+            if (currentNote < sampleSequence.length) {
+                highlightDisplayedNote(currentNote);
+                console.log(`play note ${currentNote} at time ${time}`);
+                playNoteSample(currentNote, time);
+            }
         }
     }
 
     // get the next note pointer and update the next note time
     // current note pointer is -1 when the end of the array is hit
     function nextNote() {
-        const secondsPerBeat = 60.0 / tempo;
+        console.log(currentTempo);
+        const secondsPerBeat = 60 / currentTempo;
         nextNoteTime += secondsPerBeat;
-        currentNote = (currentNote >= sampleSequence.length - 1 ? currentNote = -1 : currentNote + 1);
+        currentNote = (currentNote >= sampleSequence.length ? currentNote = -1 : currentNote + 1);
         console.log(`current note is ${currentNote}, sample sequence length ${sampleSequence.length}, next note time ${nextNoteTime}`);
-        if (currentNote < 0) 
+        if (currentNote < 0)
             highlightDisplayedNote(currentNote);
     }
 
     // will highlight the note being played and return the previous not to its origianl style
 
+    // trying a 'trick' that may or nat not work
+    // the svg elements for the notes have class='vf-stavenote' and id='vf-autonnnn'
+    // they are in the same order that the notes were added to the voice
+    // the idea is the change the fill of the svg as each note is being played
+
     function highlightDisplayedNote(currentNote: number): void {
 
         if (context != undefined) {
 
-            // unhighlight last stavenote when sequence is finished
-            if (currentNote < 0) {
-                const {note: lastStaveNote} = sampleSequence[sampleSequence.length-1];
-                if (previousStyle != undefined) lastStaveNote.setStyle(previousStyle);
-                return;
-            }
+            // unhighlight previously highlighted stavenote
+            let previousIndex = currentNote - 1;
+            if (currentNote <= 0)
+                previousIndex = sampleSequence.length - 1;
+            else
+                previousIndex = currentNote - 1;
+            const previousElement = staveNoteElements[previousIndex];
+            previousElement.setAttribute('fill', DEFAULTNOTEFILL);
 
-            // save current note's style so it can be restore later
-            const { note } = sampleSequence[currentNote];
-            const previousNote: number = currentNote - 1;
-            if (previousNote >= 0) {
-                previousStyle = note.getStyle();
+            if (currentNote >= 0) {
+                console.log(`changing style for ${currentNote}`)
+                const thisElement: Element = staveNoteElements[currentNote];
+                if (thisElement) thisElement.setAttribute('fill', HIGHLIGHTNOTEFILL);
             }
-
-            // return previous note style to its previous value
-            if (previousNote >= 0) {
-                const { note: previousStaveNote } = sampleSequence[previousNote];
-                if (previousStyle != undefined) previousStaveNote.setStyle(previousStyle);
-            }
-
-            // update the style
-            note.setStyle({ fillStyle: 'red' })
         }
     }
 
@@ -278,7 +288,7 @@ export default function PlayNotes(props: PlayNotesProps) {
         if (context != undefined) {
             const { buffer: thisNoteBuffer, envelop } = sampleSequence[currentNote];
             const vol = context.createGain();
-            setGainEnvelop(vol.gain, volume, envelop, time);
+            setGainEnvelop(vol.gain, currentVolume, envelop, time);
             const panner: StereoPannerNode = context.createStereoPanner();
             panner.pan.value = 0;
             thisNoteBuffer.connect(vol);

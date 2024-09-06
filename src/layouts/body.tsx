@@ -221,7 +221,7 @@ export default function Body(props: BodyProps) {
                                     keySignature={keySignature}
                                     displayOption={displayOption}
                                     width={1200}
-                                    height={500}
+                                    height={300}
                                     setMessage={props.setMessage}
                                     setNotes={setNotes}
                                 />

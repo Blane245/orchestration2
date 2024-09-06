@@ -31,7 +31,7 @@ export function DrawNotes(props: DrawNotesProps) {
 
             // setup stave based on the instrument's clef, the selected key signature
             //  and the instrument's clef annotation
-            const stave: Stave = new Stave(10, 40, 1200);
+            const stave: Stave = new Stave(10, 100, width-20);
             stave.addClef(instrument.clef.name, undefined, instrument.clef.annotation);
             stave.addKeySignature(keySignature.rootKeyName);
             stave.setContext(context).draw();
@@ -43,13 +43,13 @@ export function DrawNotes(props: DrawNotesProps) {
             // build the voice from the notes provided
             const voice = new Voice({ num_beats: notes.length, beat_value: 4 })
             voice.addTickables(notes)
-            new Formatter().joinVoices([voice]).format([voice], 350);
+            new Formatter().joinVoices([voice]).format([voice]/*, 350 */);
             voice.setContext(context);
             voice.setStave(stave);
             voice.draw();
         }
 
-    }, [scale, mode, instrument, pitch, keySignature, width, length, displayOption])
+    }, [scale, mode, instrument, pitch, keySignature, width, height, displayOption])
 
     return (
         <>
@@ -59,6 +59,17 @@ export function DrawNotes(props: DrawNotesProps) {
 
     // helper functions
 
+    // get a full keyboard of accidantals based on the key signature
+    function generateAccidentals(size: number, accidentals:string) :string {
+        let result:string = '';
+        for (let i = 0; i < size; i++) {
+            const index = i % 8;
+            const acc = accidentals.substring(index, index+1);
+            result = result.concat(acc);
+        }
+        return result;
+    }
+
     // get the stave notes for the instrument including any modifiers
     // modifiers appear on teh harmoni and melodic minor keys
     function getInstrumentNotes(): StaveNote[] {
@@ -67,7 +78,7 @@ export function DrawNotes(props: DrawNotesProps) {
         const lowNote: number = instrument.lowNote; // lowest note that the instrument can perform
         const highNote: number = instrument.highNote; // the highest note the instrument can perform
         let includedNotes: number[] = []; // this will be set based on the key signature and scale
-        let currentAccidentals = keySignature.accidentals; // accidentals are tracked as they change. initially key are the kley's accidentals
+        let currentAccidentals = generateAccidentals(KEYBOARD.length, keySignature.accidentals);
         let modifier: string = ''; // the current note modifier
         if (displayOption.includes('Ascending')) {
 
@@ -163,9 +174,10 @@ export function DrawNotes(props: DrawNotesProps) {
     function getModifier(noteName: string, accidentals: string): [string, string] {
         const allowedNotes: string = 'CDEFGAB' // the breath of possible note names
         const noteNamePieces: string[] = noteName.split('/'); // the full note name and octave
-        const nameIndex = allowedNotes.indexOf(noteNamePieces[0].substring(0, 1)); // the location of the note in the list of accidentals
         const baseNoteModifier = noteNamePieces[0].substring(1, 2); // get current modifier
-        let currentAccidentals: string = accidentals; // the accidentals to the changes
+        const octave:number = parseInt(noteNamePieces[1]);
+        const nameIndex = allowedNotes.indexOf(noteNamePieces[0].substring(0, 1)) + octave * 8; // the location of the note in the list of accidentals
+        let currentAccidentals: string = accidentals; // the accidentals to be changes
         let modifier: string = '';
         switch (currentAccidentals[nameIndex]) {
             case 'n':
