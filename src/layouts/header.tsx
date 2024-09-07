@@ -1,6 +1,5 @@
 import { AppBar, Typography, Container } from "@mui/material"
 import { Message } from "../types/types"
-import { HEADER } from "./config-layout"
 
 export interface HeaderProps {
     appIcon: string,
@@ -14,8 +13,7 @@ export default function Header(props: HeaderProps) {
     return (
         <AppBar
             sx={{
-                boxShadow: 'none',
-                height: HEADER.H_DESKTOP
+                boxShadow: 'none'
             }}
             position="fixed"
         >

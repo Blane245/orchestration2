@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Grid } from '@mui/material'
-import { DisplayOption, DISPLAYOPTIONS, VXInstrument, VXInstrumentS, KeySignature, KEYSIGNATURES, Mode, MODES, Pitch, PITCHES, Scale, SCALES } from '../types/types'
-import { HEADER, SPACING } from './config-layout';
+import { Box, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import Grid2 from '@mui/material/Unstable_Grid2'
+import { DisplayOption, DISPLAYOPTIONS, VXInstrument, VXInstruments, KeySignature, KEYSIGNATURES, Mode, MODES, Pitch, PITCHES, Scale, SCALES } from '../types/types'
 import { DrawNotes } from '../components/drawnotes';
 import PlayNotes from '../components/playnotes';
 import { StaveNote } from 'vexflow';
@@ -25,11 +25,11 @@ export default function Body(props: BodyProps) {
         setScale(SCALES[0]);
         setMode(MODES[0]);
         setKeySignature(KEYSIGNATURES[0]);
-        setInstrument(VXInstrumentS[0]);
+        setInstrument(VXInstruments[0]);
         setPitch(PITCHES[0]);
         setDisplayOption(DISPLAYOPTIONS[0])
         props.setMessage({ error: false, text: 'Welcome to Instrument Notes' });
-        UpdateStatus(VXInstrumentS[0], SCALES[0], MODES[0], PITCHES[0], KEYSIGNATURES[0], DISPLAYOPTIONS[0]);
+        UpdateStatus(VXInstruments[0], SCALES[0], MODES[0], PITCHES[0], KEYSIGNATURES[0], DISPLAYOPTIONS[0]);
     }, [props.setMessage, props.setStatus])
 
     function UpdateStatus(inst: VXInstrument | undefined, scal: Scale | undefined, mod: Mode | undefined, pitc: Pitch | undefined, key: KeySignature | undefined, display: DisplayOption | undefined) {
@@ -41,12 +41,12 @@ export default function Body(props: BodyProps) {
             key != undefined &&
             display != undefined
         )
-            props.setStatus(`Instrument: ${inst.name}, key: ${key.name} scale: ${scal.name}, mode: ${mod.name}, pitch: ${pitc}, display: ${display}`);
+            props.setStatus(`Instrument: ${inst.name}, key: ${key.name} scale: ${scal.name}, mode: ${mod.name}, pitch: ${pitc.name}, display: ${display}`);
     }
 
-    function HandleInstrumentChange(event: React.ChangeEvent<HTMLSelectElement>): void {
+    function HandleInstrumentChange(event: SelectChangeEvent): void {
         const instName: string = event.target.value;
-        const inst: VXInstrument | undefined = VXInstrumentS.find((i) => i.name == instName);
+        const inst: VXInstrument | undefined = VXInstruments.find((i) => i.name == instName);
         if (inst !== undefined) {
             setInstrument(inst);
             UpdateStatus(inst, scale, mode, pitch, keySignature, displayOption);
@@ -55,7 +55,7 @@ export default function Body(props: BodyProps) {
         }
     }
 
-    function HandleScaleChange(event: React.ChangeEvent<HTMLSelectElement>): void {
+    function HandleScaleChange(event: SelectChangeEvent): void {
         const scaleName: string = event.target.value;
         const scal: Scale | undefined = SCALES.find((s) => s.name == scaleName);
         if (scal !== undefined) {
@@ -66,7 +66,7 @@ export default function Body(props: BodyProps) {
         }
     }
 
-    function HandleModeChange(event: React.ChangeEvent<HTMLSelectElement>): void {
+    function HandleModeChange(event: SelectChangeEvent): void {
         const modeName: string = event.target.value;
         const mod: Mode | undefined = MODES.find((m) => m.name == modeName);
         if (mod !== undefined) {
@@ -77,9 +77,9 @@ export default function Body(props: BodyProps) {
         }
     }
 
-    function HandlePitchChange(event: React.ChangeEvent<HTMLSelectElement>): void {
+    function HandlePitchChange(event: SelectChangeEvent): void {
         const pitchName: string = event.target.value;
-        const pitc: Pitch | undefined = PITCHES.find((p) => p == pitchName);
+        const pitc: Pitch | undefined = PITCHES.find((p) => p.name == pitchName);
         if (pitc !== undefined) {
             setPitch(pitc);
             UpdateStatus(instrument, scale, mode, pitc, keySignature, displayOption);
@@ -88,7 +88,7 @@ export default function Body(props: BodyProps) {
         }
     }
 
-    function HandleKeyChange(event: React.ChangeEvent<HTMLSelectElement>): void {
+    function HandleKeyChange(event: SelectChangeEvent): void {
         const keyName: string = event.target.value;
         const key: KeySignature | undefined = KEYSIGNATURES.find((k) => k.name == keyName);
         if (key !== undefined) {
@@ -99,7 +99,7 @@ export default function Body(props: BodyProps) {
         }
     }
 
-    function HandleDisplayChange(event: React.ChangeEvent<HTMLSelectElement>): void {
+    function HandleDisplayChange(event: SelectChangeEvent): void {
         const displayName: string = event.target.value;
         const display: DisplayOption | undefined = DISPLAYOPTIONS.find((d) => d == displayName);
         if (display !== undefined) {
@@ -111,132 +111,127 @@ export default function Body(props: BodyProps) {
     }
 
     return (
-        <Box
-            component='main'
-            sx={{
-                flexGrow: 1,
-                minHeight: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                px: 2,
-                py: `${HEADER.H_DESKTOP} + ${SPACING}px`
-            }}
-        >
-            <Grid container direction='column'>
-                <Grid container direction='row'>
-                    <Grid item>
-                        {/* select instrument */}
-                        <label htmlFor='instrument'>&nbsp;Instrument: </label>
-                        <select
-                            id='instrument'
-                            value={instrument != undefined ? instrument.name : VXInstrumentS[0].name}
-                            onChange={((event: React.ChangeEvent<HTMLSelectElement>) =>
-                                HandleInstrumentChange(event))}
-                        >
-                            {VXInstrumentS.map((i) => (
-                                <option key={i.name} value={i.name}>{i.name}</option>
-                            ))}
-                        </select>
-                    </Grid>
-                    <Grid item>
-                        {/* select scale */}
-                        <label htmlFor='scale'>&nbsp;Scale: </label>
-                        <select
-                            id='scale'
-                            value={scale != undefined ? scale.name : SCALES[0].name}
-                            onChange={((event: React.ChangeEvent<HTMLSelectElement>) =>
-                                HandleScaleChange(event))}
-                        >
-                            {SCALES.map((s) => (
-                                <option key={s.name} value={s.name}>{s.name}</option>
-                            ))}
-                        </select>
-                    </Grid>
-                    <Grid item>
-                        {/* select mode */}
-                        <label htmlFor='mode'>&nbsp;Mode: </label>
-                        <select
-                            id='mode'
-                            value={mode != undefined ? mode.name : MODES[0].name}
-                            onChange={((event: React.ChangeEvent<HTMLSelectElement>) =>
-                                HandleModeChange(event))}
-                        >
-                            {MODES.map((m) => (
-                                <option key={m.name} value={m.name}>{m.name}</option>
-                            ))}
-                        </select>
-                    </Grid>
-                    <Grid item>
-                        {/* select key */}
-                        <label htmlFor='key'>&nbsp;Key: </label>
-                        <select
-                            id='key'
-                            value={keySignature != undefined ? keySignature.name : KEYSIGNATURES[0].name}
-                            onChange={((event: React.ChangeEvent<HTMLSelectElement>) =>
-                                HandleKeyChange(event))}
-                        >
-                            {KEYSIGNATURES.map((k) => (
-                                <option key={k.name} value={k.name}>{k.name}</option>
-                            ))}
-                        </select>
-                    </Grid>
-                    <Grid item>
-                        {/* select pitch */}
-                        <label htmlFor='pitch'>&nbsp;Pitch: </label>
-                        <select
-                            id='pitch'
-                            value={pitch != undefined ? pitch : PITCHES[0]}
-                            onChange={((event: React.ChangeEvent<HTMLSelectElement>) =>
-                                HandlePitchChange(event))}
-                        >
-                            {PITCHES.map((p) => (
-                                <option key={p} value={p}>{p}</option>
-                            ))}
-                        </select>
-                    </Grid>
-                    <Grid item>
-                        {/* select display option */}
-                        <label htmlFor='display'>&nbsp;Display Option: </label>
-                        <select
-                            id='display'
-                            value={displayOption != undefined ? displayOption : DISPLAYOPTIONS[0]}
-                            onChange={((event: React.ChangeEvent<HTMLSelectElement>) =>
-                                HandleDisplayChange(event))}
-                        >
-                            {DISPLAYOPTIONS.map((d) => (
-                                <option key={d} value={d}>{d}</option>
-                            ))}
-                        </select>
-                    </Grid>
+        <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={2}>
+                <Grid item xs={2}>
+                    {/* select instrument */}
+                    <InputLabel id='instrument-label'>Instrument</InputLabel>
+                    <Select
+                        labelId='instrument-label'
+                        id='instrument-select'
+                        value={instrument != undefined ? instrument.name : VXInstruments[0].name}
+                        onChange={HandleInstrumentChange}
+                    >
+                        {VXInstruments.map((i) => (
+                            <MenuItem key={'instrument-' + i.name} value={i.name}>{i.name}</MenuItem>
+                        ))}
+                    </Select>
+
                 </Grid>
-                <Grid container direction='row' justifyContent='flex-start'>
-                    <Grid item sm={'auto'}>
-                        <Box display='flex' justifyContent='flex-start'>
-                            {scale != undefined && keySignature != undefined && pitch != undefined && mode != undefined && instrument != undefined && displayOption != undefined ?
-                                <DrawNotes
-                                    scale={scale}
-                                    pitch={pitch}
-                                    mode={mode}
-                                    instrument={instrument}
-                                    keySignature={keySignature}
-                                    displayOption={displayOption}
-                                    width={1200}
-                                    height={300}
-                                    setMessage={props.setMessage}
-                                    setNotes={setNotes}
-                                />
-                                : null}
-                        </Box>
-                    </Grid>
+                <Grid item xs={2}>
+                    {/* select scale */}
+                    <InputLabel id='scale-label'>Scale</InputLabel>
+                    <Select
+                        labelId='scale-label'
+                        id='scale-select'
+                        value={scale != undefined ? scale.name : SCALES[0].name}
+                        onChange={HandleScaleChange}
+                    >
+                        {SCALES.map((i) => (
+                            <MenuItem key={'scale-' + i.name} value={i.name}>{i.name}</MenuItem>
+                        ))}
+                    </Select>
+
                 </Grid>
-                <Grid container direction='row' justifyContent={'flex-start'}>
+                <Grid item xs={2}>
+                    {/* select mode */}
+                    <InputLabel id='mode-label'>Mode</InputLabel>
+                    <Select
+                        labelId='mode-label'
+                        id='mode-select'
+                        value={mode != undefined ? mode.name : MODES[0].name}
+                        onChange={HandleModeChange}
+                    >
+                        {MODES.map((i) => (
+                            <MenuItem key={'mode-' + i.name} value={i.name}>{i.name}</MenuItem>
+                        ))}
+                    </Select>
+
+                </Grid>
+                <Grid item xs={2}>
+                    {/* select key */}
+                    <InputLabel id='key-label'>Key</InputLabel>
+                    <Select
+                        labelId='key-label'
+                        id='key-select'
+                        value={keySignature != undefined ? keySignature.name : KEYSIGNATURES[0].name}
+                        onChange={HandleKeyChange}
+                    >
+                        {KEYSIGNATURES.map((i) => (
+                            <MenuItem key={'key-' + i.name} value={i.name}>{i.name}</MenuItem>
+                        ))}
+                    </Select>
+
+                </Grid>
+                <Grid item xs={2}>
+                    {/* select pitch */}
+                    <InputLabel id='pitch-label'>Key</InputLabel>
+                    <Select
+                        labelId='pitch-label'
+                        id='pitch-select'
+                        value={pitch != undefined ? pitch.name : PITCHES[0].name}
+                        onChange={HandlePitchChange}
+                    >
+                        {PITCHES.map((i) => (
+                            <MenuItem key={'pitch-' + i.name} value={i.name}>{i.name}</MenuItem>
+                        ))}
+                    </Select>
+
+                </Grid>
+                <Grid item xs={2}>
+                    {/* select display option */}
+                    <InputLabel id='display-label'>Key</InputLabel>
+                    <Select
+                        labelId='display-label'
+                        id='display-select'
+                        value={displayOption != undefined ? displayOption : DISPLAYOPTIONS[0]}
+                        onChange={HandleDisplayChange}
+                    >
+                        {DISPLAYOPTIONS.map((i) => (
+                            <MenuItem key={'pitch-' + i} value={i}>{i}</MenuItem>
+                        ))}
+                    </Select>
+
+                </Grid>
+            </Grid>
+            <Grid item xs={12}>
+                <Box display='flex' justifyContent='flex-start'>
+                    {scale != undefined && keySignature != undefined && pitch != undefined && mode != undefined && instrument != undefined && displayOption != undefined ?
+                        <DrawNotes
+                            scale={scale}
+                            pitch={pitch}
+                            mode={mode}
+                            instrument={instrument}
+                            keySignature={keySignature}
+                            displayOption={displayOption}
+                            width={1200}
+                            height={300}
+                            setMessage={props.setMessage}
+                            setNotes={setNotes}
+                        />
+                        : null}
+                </Box>
+            </Grid>
+            <Grid container spacing={2}>
+                {instrument && pitch ?
                     <PlayNotes
                         notes={notes}
                         VXInstrument={instrument}
+                        pitch={pitch}
                         setMessage={props.setMessage}
-                    />
-                </Grid>
+                    /> : null}
             </Grid>
         </Box>
+
     )
 }

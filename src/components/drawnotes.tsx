@@ -1,6 +1,7 @@
 import { Accidental, Formatter, Renderer, Stave, StaveNote, Voice } from 'vexflow'
-import { ACCIDENTAL, DisplayOption, VXInstrument, KEYBOARD, BaseNote, KeySignature, Mode, Pitch, Scale} from '../types/types'
+import { ACCIDENTAL, DisplayOption, VXInstrument, KEYBOARD, BaseNote, KeySignature, Mode, Pitch, Scale, KEYSIGNATURES} from '../types/types'
 import { useEffect } from 'react';
+import { getNoteName, transposeKey, transposeNote } from '../utils/vxutils';
 
 // using VexFlow, draw the notes requested
 export interface DrawNotesProps {
@@ -33,7 +34,8 @@ export function DrawNotes(props: DrawNotesProps) {
             //  and the instrument's clef annotation
             const stave: Stave = new Stave(10, 100, width-20);
             stave.addClef(instrument.clef.name, undefined, instrument.clef.annotation);
-            stave.addKeySignature(keySignature.rootKeyName);
+            const thisSignature: string = (pitch.name == 'Concert'? keySignature.rootKeyName: transposeKey(keySignature, instrument).name);
+            stave.addKeySignature(thisSignature);
             stave.setContext(context).draw();
 
             // get the notes for the instrument
@@ -94,7 +96,8 @@ export function DrawNotes(props: DrawNotesProps) {
                 if (includedNotes.find((value) => value % 12 == nominalValue) != undefined) {
 
                     // get the note's name based on where the key signature has sharp, flat, or no accidentals
-                    const noteName = getNoteName(keySignature.keyAccidental, KEYBOARD[i]);
+                    let noteName: string = getNoteName(keySignature.keyAccidental, KEYBOARD[i]);
+                    if (pitch.name == 'instrument') noteName = transposeNote (noteName, KEYSIGNATURES[0], instrument.instrumentPitch);
 
                     // get the note's modifier and track the current accidentals
                     [modifier, currentAccidentals] = getModifier(noteName, currentAccidentals)
@@ -140,28 +143,6 @@ export function DrawNotes(props: DrawNotesProps) {
         }
         return notes;
 
-    }
-
-    // get the note name based on the key signature's accidental
-    function getNoteName(keyAccidental: ACCIDENTAL, thisNote: BaseNote): string {
-        let noteName: string = 'C/4';
-        switch (keyAccidental) {
-            case ACCIDENTAL.none:
-                if (thisNote.naturalName) noteName = thisNote.naturalName;
-                else noteName = thisNote.sharpName as string;
-                break;
-            case ACCIDENTAL.flat:
-                if (thisNote.flatName) noteName = thisNote.flatName;
-                else noteName = thisNote.naturalName as string;
-                break;
-            case ACCIDENTAL.sharp:
-                if (thisNote.sharpName) noteName = thisNote.sharpName;
-                else noteName = thisNote.naturalName as string;
-                break;
-            default:
-                break;
-        }
-        return noteName;
     }
 
     // helper for modifying currentAccidentals in getModifier

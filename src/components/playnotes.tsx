@@ -3,17 +3,19 @@
 // TODO notes are being played too short
 import { Button, Grid, Slider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { StaveNote, ElementStyle } from "vexflow";
-import { VXInstrument, Message } from "../types/types";
+import { StaveNote } from "vexflow";
+import { VXInstrument, Message, KEYSIGNATURES, Pitch } from "../types/types";
 import { SoundFont2 } from "soundfont2";
 import { loadSoundFont } from "../middleware/soundfont";
 import { getBufferSourceNodeFromSample, precision, tc2s, toMidi } from "../utils/soundfont2utils";
 import { Envelop, Preset } from "../types/soundfonttypes";
+import { transposeNote } from "../utils/vxutils";
 
 // may add sound file selector 
 export interface PlayNotesProps {
-    VXInstrument: VXInstrument | undefined,
+    VXInstrument: VXInstrument,
     notes: StaveNote[],
+    pitch: Pitch,
     setMessage: Function,
 }
 
@@ -45,7 +47,7 @@ export default function PlayNotes(props: PlayNotesProps) {
     const [tempo, setTempo] = useState<number>(60);
     const [volume, setVolume] = useState<number>(50);
     const [presets, setPresets] = useState<Preset[]>([]);
-    const { VXInstrument, notes, setMessage } = props;
+    const { notes, pitch, VXInstrument, setMessage } = props;
 
     // load the soundfont file when initializing
     //TODO deconflict Preset interface 
@@ -83,7 +85,7 @@ export default function PlayNotes(props: PlayNotesProps) {
             } else {
                 context = new AudioContext();
                 // setup the note sequencing
-                const { sources, message } = setupNoteSequence(preset, context, notes);
+                const { sources, message } = setupNoteSequence(preset, context, notes, VXInstrument, pitch);
                 if (message.error) {
                     setMessage(message);
                 } else {
@@ -106,7 +108,7 @@ export default function PlayNotes(props: PlayNotesProps) {
 
     return (
         <>
-            <Grid item>
+            <Grid item xs={4}>
                 <Button
                     onClick={() => { if (running) stopRunning = true; setRunning(!running) }}
                     disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
@@ -114,7 +116,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     {running ? 'Stop' : 'Start'}
                 </Button>
             </Grid>
-            <Grid item>
+            <Grid item xs={4}>
                 <Typography id='speed-slider' gutterBottom>
                     BPM: {tempo}
                 </Typography>
@@ -128,7 +130,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
                 />
             </Grid>
-            <Grid item>
+            <Grid item xs={4}>
                 <Typography id='volume-slider' gutterBottom>
                     Volume: {volume}
                 </Typography>
@@ -152,7 +154,7 @@ export default function PlayNotes(props: PlayNotesProps) {
     // get the sample
     // the volume setting is applied to the gain
     // when mature, this will have attack, sustain, and decay 
-    function setupNoteSequence(preset: Preset, context: AudioContext, notes: StaveNote[]): {
+    function setupNoteSequence(preset: Preset, context: AudioContext, notes: StaveNote[], instrument: VXInstrument, pitch: Pitch): {
         sources: {
             buffer: AudioBufferSourceNode,
             envelop: Envelop,
@@ -167,7 +169,8 @@ export default function PlayNotes(props: PlayNotesProps) {
         const result: { buffer: AudioBufferSourceNode, envelop: Envelop, noteElement: Element }[] = [];
         let message: Message = { error: false, text: '' };
         notes.every((note, index) => {
-            const noteName = note.keys[0];
+            let noteName = note.keys[0];
+            if (pitch.name == 'instrument') noteName = transposeNote (noteName, instrument.instrumentPitch, KEYSIGNATURES[0]);
             const midi: number | undefined = toMidi(noteName);
             if (midi == undefined) {
                 message = { error: true, text: `Note ${noteName} has no midi number.` };
@@ -204,6 +207,10 @@ export default function PlayNotes(props: PlayNotesProps) {
         else {
             clearTimeout(timerID);
             setRunning(false);
+            // set all note styles to default
+            for (let i = 0; i < staveNoteElements.length; i++) {
+                staveNoteElements[i].setAttribute('fill', DEFAULTNOTEFILL)
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 import { StaveNote } from "vexflow";
 import { Envelop, Generator, Zone, Preset } from "../types/soundfonttypes";
-import { Message } from "../types/types";
+import { ACCIDENTAL, Message } from "../types/types";
 
 export const tokenizeNote = (note: string): string[] => {
   const [pc, acc = '', oct] = note.replace('/', '').match(/^([a-gA-G])([#bs]*)([0-9])?$/)?.slice(1) || [];

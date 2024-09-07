@@ -1,10 +1,12 @@
 export type Message = { text: string, error: boolean }
 
-export type Pitch = string
+export type Pitch = {
+    name: string,
+}
 export const PITCHES: Pitch[] = [
-    'Concert',
-    'Instrument'
-]
+    {name:'Concert'},
+    {name:'Instrument'}
+];
 
 // note numbers from C to B for chromatic scale
 export const CHROMATIC: number[] = Array.from(Array(12).keys())
@@ -138,38 +140,38 @@ function generateKeySignatures() {
         generateKeySignature('b harmonic', 11, 'harmonicminor', 'D', ACCIDENTAL.sharp, '#nn#nnn'),
         generateKeySignature('b melodic', 11, 'melodicminor', 'D', ACCIDENTAL.sharp, '#nn#nnn'),
         generateKeySignature('A', 9, 'major', 'A', ACCIDENTAL.sharp, '#nn##nn'), // F# C# G#
-        generateKeySignature('f♯ natural', 6, 'naturalminor', 'A', ACCIDENTAL.sharp, '#nn##nn'),
-        generateKeySignature('f♯ harmonic', 6, 'harmonicminor', 'A', ACCIDENTAL.sharp, '#nn##nn'),
-        generateKeySignature('f♯ melodic', 6, 'melodicminor', 'A', ACCIDENTAL.sharp, '#nn##nn'),
+        generateKeySignature('f# natural', 6, 'naturalminor', 'A', ACCIDENTAL.sharp, '#nn##nn'),
+        generateKeySignature('f# harmonic', 6, 'harmonicminor', 'A', ACCIDENTAL.sharp, '#nn##nn'),
+        generateKeySignature('f# melodic', 6, 'melodicminor', 'A', ACCIDENTAL.sharp, '#nn##nn'),
         generateKeySignature('E', 4, 'major', 'E', ACCIDENTAL.sharp, '##n##nn'), // F# C# G# D#
-        generateKeySignature('c♯ natural', 1, 'naturalminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
-        generateKeySignature('c♯ harmonic', 1, 'harmonicminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
-        generateKeySignature('c♯ melodic', 1, 'melodicminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
+        generateKeySignature('c# natural', 1, 'naturalminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
+        generateKeySignature('c# harmonic', 1, 'harmonicminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
+        generateKeySignature('c# melodic', 1, 'melodicminor', 'E', ACCIDENTAL.sharp, '##n##nn'),
         generateKeySignature('B', 11, 'major', 'B', ACCIDENTAL.sharp, '##n###n'), // F# C# G# D# A#
-        generateKeySignature('g♯ natural', 8, 'naturalminor', 'B', ACCIDENTAL.sharp, '##n###n'),
-        generateKeySignature('g♯ harmonic', 8, 'harmonicminor', 'B', ACCIDENTAL.sharp, '##n###n'),
-        generateKeySignature('g♯ melodic', 8, 'melodicminor', 'B', ACCIDENTAL.sharp, '##n###n'),
-        generateKeySignature('F♯', 6, 'major', 'F#', ACCIDENTAL.sharp, '######n'), // F# C# G# D# A# E#
-        generateKeySignature('d♯ natural', 3, 'naturalminor', 'F#', ACCIDENTAL.sharp, '######n'),
-        generateKeySignature('d♯ harmonic', 3, 'harmonicminor', 'F#', ACCIDENTAL.sharp, '######n'),
-        generateKeySignature('d♯ melodic', 3, 'melodicminor', 'F#', ACCIDENTAL.sharp, '######n'),
-        generateKeySignature('G♭', 6, 'major', 'Gb', ACCIDENTAL.flat, 'bbbnbbb'), // Bb Eb Ab, D6, Gb, Cb
-        generateKeySignature('e♭ natural', 3, 'naturalminor', 'Gb', ACCIDENTAL.flat, 'bbbnbbb'),
-        generateKeySignature('e♭ harmonic', 3, 'harmonicminor', 'Gb', ACCIDENTAL.flat, 'bbbnbbb'),
-        generateKeySignature('e♭ melodic', 3, 'melodicminor', 'Gb', ACCIDENTAL.flat, 'bbbnbbb'),
-        generateKeySignature('D♭', 1, 'major', 'Db', ACCIDENTAL.flat, 'nbbnbbb'), // Bb, Eb, Ab, D6, Gb
-        generateKeySignature('b♭ natural', 10, 'naturalminor', 'Db', ACCIDENTAL.flat, 'nbbnbbb'),
-        generateKeySignature('b♭ harmonic', 10, 'harmonicminor', 'Db', ACCIDENTAL.flat, 'nbbnbbb'),
-        generateKeySignature('b♭ melodic', 10, 'melodicminor', 'Db', ACCIDENTAL.flat, 'nbbnbbb'),
-        generateKeySignature('A♭', 8, 'major', 'Ab', ACCIDENTAL.flat, 'nbbnnbb'), // Bb, Eb, Ab, Db
+        generateKeySignature('g# natural', 8, 'naturalminor', 'B', ACCIDENTAL.sharp, '##n###n'),
+        generateKeySignature('g# harmonic', 8, 'harmonicminor', 'B', ACCIDENTAL.sharp, '##n###n'),
+        generateKeySignature('g# melodic', 8, 'melodicminor', 'B', ACCIDENTAL.sharp, '##n###n'),
+        generateKeySignature('F#', 6, 'major', 'F#', ACCIDENTAL.sharp, '######n'), // F# C# G# D# A# E#
+        generateKeySignature('d# natural', 3, 'naturalminor', 'F#', ACCIDENTAL.sharp, '######n'),
+        generateKeySignature('d# harmonic', 3, 'harmonicminor', 'F#', ACCIDENTAL.sharp, '######n'),
+        generateKeySignature('d# melodic', 3, 'melodicminor', 'F#', ACCIDENTAL.sharp, '######n'),
+        generateKeySignature('Gb', 6, 'major', 'Gb', ACCIDENTAL.flat, 'bbbnbbb'), // Bb Eb Ab, D6, Gb, Cb
+        generateKeySignature('eb natural', 3, 'naturalminor', 'Gb', ACCIDENTAL.flat, 'bbbnbbb'),
+        generateKeySignature('eb harmonic', 3, 'harmonicminor', 'Gb', ACCIDENTAL.flat, 'bbbnbbb'),
+        generateKeySignature('eb melodic', 3, 'melodicminor', 'Gb', ACCIDENTAL.flat, 'bbbnbbb'),
+        generateKeySignature('Db', 1, 'major', 'Db', ACCIDENTAL.flat, 'nbbnbbb'), // Bb, Eb, Ab, D6, Gb
+        generateKeySignature('bb natural', 10, 'naturalminor', 'Db', ACCIDENTAL.flat, 'nbbnbbb'),
+        generateKeySignature('bb harmonic', 10, 'harmonicminor', 'Db', ACCIDENTAL.flat, 'nbbnbbb'),
+        generateKeySignature('bb melodic', 10, 'melodicminor', 'Db', ACCIDENTAL.flat, 'nbbnbbb'),
+        generateKeySignature('Ab', 8, 'major', 'Ab', ACCIDENTAL.flat, 'nbbnnbb'), // Bb, Eb, Ab, Db
         generateKeySignature('f natural', 5, 'naturalminor', 'Ab', ACCIDENTAL.flat, 'nbbnnbb'),
         generateKeySignature('f harmonic', 5, 'harmonicminor', 'Ab', ACCIDENTAL.flat, 'nbbnnbb'),
         generateKeySignature('f melodic', 5, 'melodicminor', 'Ab', ACCIDENTAL.flat, 'nbbnnbb'),
-        generateKeySignature('E♭', 3, 'major', 'Eb', ACCIDENTAL.flat, 'nnbnnbb'),  // Bb Eb Ab
+        generateKeySignature('Eb', 3, 'major', 'Eb', ACCIDENTAL.flat, 'nnbnnbb'),  // Bb Eb Ab
         generateKeySignature('c natural', 0, 'naturalminor', 'Eb', ACCIDENTAL.flat, 'nnbnnbb'),
         generateKeySignature('c harmonic', 0, 'harmonicminor', 'Eb', ACCIDENTAL.flat, 'nnbnnbb'),
         generateKeySignature('c melodic', 0, 'melodicminor', 'Eb', ACCIDENTAL.flat, 'nnbnnbb'),
-        generateKeySignature('B♭', 10, 'major', 'Bb', ACCIDENTAL.flat, 'nnbnnnb'), // Bb Eb
+        generateKeySignature('Bb', 10, 'major', 'Bb', ACCIDENTAL.flat, 'nnbnnnb'), // Bb Eb
         generateKeySignature('g natural', 7, 'naturalminor', 'Bb', ACCIDENTAL.flat, 'nnbnnnb'),
         generateKeySignature('g harmonic', 7, 'harmonicminor', 'Bb', ACCIDENTAL.flat, 'nnbnnnb'),
         generateKeySignature('g melodic', 7, 'melodicminor', 'Bb', ACCIDENTAL.flat, 'nnbnnnb'),
@@ -211,13 +213,22 @@ export type VXInstrument = {
 }
 
 // the list of instruments supported
-export const VXInstrumentS: VXInstrument[] = [
+export const VXInstruments: VXInstrument[] = [
     {
         name: 'Flute',
         presetName: 'Flute',
         lowNote: 60 - 12, // C4
         highNote: 96 - 12, //C7
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
+        clef: { name: 'treble' },
+        octaveShift: 0
+    },
+    {
+        name: 'Trumpet',
+        presetName: 'mf Trumpet',
+        lowNote: 58 - 12, // Bb3
+        highNote: 84 - 12, //D6
+        instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'Bb') as KeySignature,
         clef: { name: 'treble' },
         octaveShift: 0
     },
