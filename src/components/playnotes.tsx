@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { StaveNote } from "vexflow";
 import { VXInstrument, Message, KEYSIGNATURES, Pitch } from "../types/types";
 import { SoundFont2 } from "soundfont2";
-import { loadSoundFont } from "../middleware/soundfont";
+import { loadSoundFont } from "../utils/soundfont";
 import { getBufferSourceNodeFromSample, precision, tc2s, toMidi } from "../utils/soundfont2utils";
 import { Envelop, Preset } from "../types/soundfonttypes";
 import { transposeNote } from "../utils/vxutils";
@@ -59,7 +59,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                 for (let i = 0; i < sf.presets.length; i++) {
                     // only load presets that have one zone (a single instrument)
                     if (sf.presets[i].zones.length == 1)
-                        thesePresets.push(sf.presets[i]);
+                        thesePresets.push(sf.presets[i] as Preset);
                     console.log(`loaded preset for ${sf.presets[i].header.name} at ${i}`);
                 }
                 setPresets(thesePresets);
@@ -126,7 +126,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     valueLabelDisplay='auto'
                     min={40}
                     max={220}
-                    onChange={(event, value) => { currentTempo = value as number; setTempo(value as number) }}
+                    onChange={(_, value) => { currentTempo = value as number; setTempo(value as number) }}
                     disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
                 />
             </Grid>
@@ -140,7 +140,7 @@ export default function PlayNotes(props: PlayNotesProps) {
                     valueLabelDisplay='auto'
                     min={0}
                     max={100}
-                    onChange={(event, value) => { currentVolume = value as number; setVolume(value as number) }}
+                    onChange={(_, value) => { currentVolume = value as number; setVolume(value as number) }}
                     disabled={presets == undefined || presets.length == 0 || VXInstrument == undefined}
                 />
             </Grid>

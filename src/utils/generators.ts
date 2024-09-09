@@ -1,4 +1,3 @@
-import { DEFAULT_GENERATOR_VALUES } from 'soundfont2';
 import { Instrument, InstrumentZone, Preset, PresetZone } from '../types/soundfonttypes'
 
 // http://www.synthfont.com/SFSPEC21.PDF page 38
@@ -28,20 +27,20 @@ export const generators:Record<number, string>  = {
   22: 'freqModLFO',
   23: 'delayVibLFO',
   24: 'freqVibLFO',
-  25: 'delayModEnv', // timecents: delay until attackphase starts. default: -12000
-  26: 'attackModEnv', // timecents: attack time. default: -12000
-  27: 'holdModEnv', // timecents: hold time. default: -12000
-  28: 'decayModEnv', // timecents: decay time. default: -12000
-  29: 'sustainModEnv', // in 0.1% units: sustain level. default: 0 = full level, per mille, clamp(0, 1000),
-  30: 'releaseModEnv', // timecents: decay time. default: -12000
+  25: 'delayModEnv', 
+  26: 'attackModEnv',
+  27: 'holdModEnv', 
+  28: 'decayModEnv', 
+  29: 'sustainModEnv', 
+  30: 'releaseModEnv', 
   31: 'keyNumToModEnvHold',
   32: 'keyNumToModEnvDecay',
-  33: 'delayVolEnv',
-  34: 'attackVolEnv',
-  35: 'holdVolEnv',
-  36: 'decayVolEnv',
-  37: 'sustainVolEnv',
-  38: 'releaseVolEnv',
+  33: 'delayVolEnv', // timecents: delay until attackphase starts. default: -12000
+  34: 'attackVolEnv',  // timecents: attack time. default: -12000
+  35: 'holdVolEnv', // timecents: hold time. default: -12000
+  36: 'decayVolEnv', // timecents: decay time. default: -12000
+  37: 'sustainVolEnv', // in 0.1% units: sustain level. default: 0 = full level, per mille, clamp(0, 1000),
+  38: 'releaseVolEnv', // timecents: decay time. default: -12000
   39: 'keyNumToVolEnvHold',
   40: 'keyNumToVolEnvDecay',
   41: 'instrument',

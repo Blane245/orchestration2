@@ -1,6 +1,6 @@
-import { Accidental, Formatter, Renderer, Stave, StaveNote, Voice } from 'vexflow'
-import { ACCIDENTAL, DisplayOption, VXInstrument, KEYBOARD, BaseNote, KeySignature, Mode, Pitch, Scale, KEYSIGNATURES} from '../types/types'
 import { useEffect } from 'react';
+import { Accidental, Formatter, Renderer, Stave, StaveNote, Voice } from 'vexflow';
+import { DisplayOption, KEYBOARD, KeySignature, KEYSIGNATURES, Mode, Pitch, Scale, VXInstrument } from '../types/types';
 import { getNoteName, transposeKey, transposeNote } from '../utils/vxutils';
 
 // using VexFlow, draw the notes requested

@@ -5,9 +5,6 @@ import Body from './layouts/body'
 import Footer from './layouts/footer'
 import Header from './layouts/header'
 import { Message } from './types/types'
-import { Box } from '@mui/system'
-import { HEADER, SPACING } from './layouts/config-layout'
-import { Grid } from '@mui/material'
 
 function App() {
 

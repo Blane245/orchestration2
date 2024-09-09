@@ -1,6 +1,4 @@
-import { KeyboardOptionKey } from "@mui/icons-material";
 import { ACCIDENTAL, BaseNote, KEYBOARD, KeySignature, KEYSIGNATURES, VXInstrument} from "../types/types";
-import { toMidi } from "./soundfont2utils";
 
 // get the note name based on the key signature's accidental
 export function getNoteName(keyAccidental: ACCIDENTAL, thisNote: BaseNote): string {
@@ -32,7 +30,6 @@ export function transposeNote(note: string, fromKey: KeySignature, toKey: KeySig
     const semiTones = toKey.ascendingValues[0] - fromKey.ascendingValues[0]
 
     // get the note parts
-    const noteParts: string[] = note.split('/');
     // get the basenote
     const baseIndex: number = KEYBOARD.findIndex((b) => {
         if (b.naturalName != undefined && b.naturalName == note) return true;

@@ -217,8 +217,8 @@ export const VXInstruments: VXInstrument[] = [
     {
         name: 'Flute',
         presetName: 'Flute',
-        lowNote: 60 - 12, // C4
-        highNote: 96 - 12, //C7
+        lowNote: 4 * 12, // C4
+        highNote: 7 * 12, //C7
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble' },
         octaveShift: 0
@@ -226,8 +226,8 @@ export const VXInstruments: VXInstrument[] = [
     {
         name: 'Trumpet',
         presetName: 'mf Trumpet',
-        lowNote: 58 - 12, // Bb3
-        highNote: 84 - 12, //D6
+        lowNote: 3 * 12 + 10, // Bb3
+        highNote: 6 * 12 + 2, //D6
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'Bb') as KeySignature,
         clef: { name: 'treble' },
         octaveShift: 0
@@ -235,8 +235,8 @@ export const VXInstruments: VXInstrument[] = [
     {
         name: 'Bassoon',
         presetName: 'Bassoon',
-        lowNote: 34 - 12, // Bb1
-        highNote: 75 - 12, // Eb5
+        lowNote: 1 * 12 + 10, // Bb1
+        highNote: 5 * 12 + 3, // Eb5
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'bass' },
         octaveShift: 0
@@ -244,8 +244,8 @@ export const VXInstruments: VXInstrument[] = [
     {
         name: 'Violin',
         presetName: 'Violin',
-        lowNote: 55-12, // G3
-        highNote: 107-12, // B7
+        lowNote: 3 * 12 + 7, // G3
+        highNote: 7 * 12 + 11, // B7
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble' },
         octaveShift: 0
@@ -253,8 +253,8 @@ export const VXInstruments: VXInstrument[] = [
     {
         name: 'Viola',
         presetName: 'Viola',
-        lowNote: 48-12, // C3
-        highNote: 91-12, // G6
+        lowNote: 3 * 12, // C3
+        highNote: 6 * 12 + 7, // G6
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble'},
         octaveShift: 0
@@ -262,8 +262,26 @@ export const VXInstruments: VXInstrument[] = [
     {
         name: 'Cello',
         presetName: 'Cello',
-        lowNote: 36-12, // C2
-        highNote: 72-12, // C5
+        lowNote: 2 * 12, // C2
+        highNote: 5 * 12, // C5
+        instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
+        clef: { name: 'bass' },
+        octaveShift: 0
+    },
+    {
+        name: 'Clarinet',
+        presetName: 'Clarinet',
+        lowNote: 3 * 12, // E3
+        highNote: 6 * 12 + 7, // G6
+        instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'Bb') as KeySignature,
+        clef: { name: 'treble' },
+        octaveShift: 0
+    },
+    {
+        name: 'Oboe',
+        presetName: 'Oboe',
+        lowNote: 3 * 12 + 11, // B3
+        highNote: 6 * 12 + 7, // G6
         instrumentPitch: KEYSIGNATURES.find((k) => k.name == 'C') as KeySignature,
         clef: { name: 'treble' },
         octaveShift: 0

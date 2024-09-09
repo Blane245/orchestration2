@@ -1,6 +1,5 @@
-import { StaveNote } from "vexflow";
 import { Envelop, Generator, Zone, Preset } from "../types/soundfonttypes";
-import { ACCIDENTAL, Message } from "../types/types";
+import { Message } from "../types/types";
 
 export const tokenizeNote = (note: string): string[] => {
   const [pc, acc = '', oct] = note.replace('/', '').match(/^([a-gA-G])([#bs]*)([0-9])?$/)?.slice(1) || [];
@@ -94,11 +93,11 @@ export function getGeneratorValues(preset: Preset, midi: number): Map<number, nu
     [54, 0], // samplemodes
     [47, 0.3], // velocity
     [34, -12000],  // attackvolenv
-    [33, -12000], //decayvolenv
+    [36, -12000], //decayvolenv
   ]
   ); 
 
-  result.forEach((value, key, map) => {
+  result.forEach((_, key, map) => {
     const newValue = getGeneratorData(preset, midi, key, map.get(key));
     map.set(key, newValue);
   });
@@ -121,10 +120,16 @@ export function getBufferSourceNodeFromSample(
   const generatorValues: Map<number, number> = getGeneratorValues(preset, midi);
   // get the sample for the midi number given and condition it
 
-  const iZoneIndex: number = preset.zones[0].instrument.zones
+  const instrumentZones = preset.zones[0].instrument.zones
+  let iZoneIndex: number = instrumentZones
     .findIndex((z) => (z.keyRange && midi >= z.keyRange.lo && midi <= z.keyRange.hi));
+  if (iZoneIndex < 0) {
+      return ({source: {buffer: context.createBufferSource(), envelop: {}}, message: {error:true, text: `could not find the zone for instrument ${preset.header.name}, midi ${midi}`}})    
+  }
 
-  const { header, data } = preset.zones[0].instrument.zones[iZoneIndex].sample;
+  // allow the midi to go below the first zone and above the last zone
+
+  const { header, data } = instrumentZones[iZoneIndex].sample;
   const float32 = new Float32Array(data.length);
   for (let i = 0; i < data.length; i++) {
     float32[i] = data[i] / 32768.0;

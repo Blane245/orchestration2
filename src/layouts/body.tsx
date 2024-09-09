@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import { Box, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2'
-import { DisplayOption, DISPLAYOPTIONS, VXInstrument, VXInstruments, KeySignature, KEYSIGNATURES, Mode, MODES, Pitch, PITCHES, Scale, SCALES } from '../types/types'
+import { Box, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { StaveNote } from 'vexflow';
 import { DrawNotes } from '../components/drawnotes';
 import PlayNotes from '../components/playnotes';
-import { StaveNote } from 'vexflow';
+import { DisplayOption, DISPLAYOPTIONS, KeySignature, KEYSIGNATURES, Mode, MODES, Pitch, PITCHES, Scale, SCALES, VXInstrument, VXInstruments } from '../types/types';
 
 export interface BodyProps {
     setMessage: Function,
